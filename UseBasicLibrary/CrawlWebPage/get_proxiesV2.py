@@ -4,26 +4,33 @@ import re
 import time
 import requests
 import random
+from UseBasicLibrary.CrawlWebPage.UserAgents import USER_AGENTS
+from UseBasicLibrary.CrawlWebPage.PROXIES import PROXIES
+
+
+def get_user_agent():
+    return random.choice(USER_AGENTS)
+
+
+def get_proxies():
+    return random.choice(PROXIES)
 
 
 def get_one_page(url):
-    proxies = {
-        "https": "https://106.75.226.36:808"
-    }
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko)'
-                      'Chrome/52.0.2743.116 Safari/537.36'
-    }
-    try:
-        res = requests.get(url, headers=headers, proxies=proxies)
-        # res.encoding = "utf-8"
-        if res.status_code == 200:
-            return res.text
-        else:
-            return None
-    except requests.exceptions as e:
-        print(e)
-        return None
+    while True:
+        try:
+            proxies = get_proxies()
+            headers = dict()
+            headers['User-Agent'] = get_user_agent()
+            # print(proxies)
+            # print(headers)
+            res = requests.get(url, headers=headers, proxies=proxies, timeout=60)
+            # res.encoding = "utf-8"
+            if res.status_code == 200:
+                return res.text
+        except BaseException as e:
+            print(e)
+            time.sleep(30)
 
 
 def parse_one_page(html):
@@ -53,7 +60,7 @@ def parse_one_page(html):
 def write_to_file(content):
     # a 表示向文件追加，不会覆盖
     # filename = 'result' + time.strftime("_%Y_%m_%d_%H_%M_%S", time.gmtime()) + ".txt"
-    with open('proxies_result2.txt', 'a', encoding="utf-8") as f:
+    with open('proxies_result4.txt', 'a', encoding="utf-8") as f:
         # print(type(json.dumps(content)))
         f.writelines(json.dumps(content, ensure_ascii=False) + "\n")
     f.close()
@@ -62,6 +69,7 @@ def write_to_file(content):
 def main(offset=1):
     url = "http://www.xicidaili.com/nn/" + str(offset)
     html = get_one_page(url)
+    # print(html)
     dict_iter = parse_one_page(html)
     for item in dict_iter:
         # print(item)
@@ -70,8 +78,8 @@ def main(offset=1):
 
 
 if __name__ == "__main__":
-    for i in range(10):
-        main()
+    for i in range(100):
+        main(random.randint(100, 201))
         print("已完成：" + str(i / 100 * 100) + "%")
-        time.sleep(random.randint(1, 3))
+        time.sleep(random.randint(60, 70))
 

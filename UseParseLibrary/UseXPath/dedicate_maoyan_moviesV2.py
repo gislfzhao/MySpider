@@ -1,27 +1,37 @@
 # -*- coding: utf-8 -*-
 import json
+import random
 import re
 import time
+
 import requests
 import xlwings as xw
-import random
+from lxml import etree
+
+from UseBasicLibrary.CrawlWebPage.PROXIES import PROXIES
+from UseBasicLibrary.CrawlWebPage.UserAgents import USER_AGENTS
+
+
+def get_user_agent():
+    return random.choice(USER_AGENTS)
+
+
+def get_proxies():
+    return random.choice(PROXIES)
 
 
 def get_one_page(url):
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko)'
-                      'Chrome/52.0.2743.116 Safari/537.36'
-    }
-    try:
-        res = requests.get(url, headers=headers)
-        # res.encoding = "utf-8"
-        if res.status_code == 200:
-            return res.text
-        else:
-            return None
-    except BaseException as e:  # except requests.exceptions as e:
-        print(e)
-        return None
+    while True:
+        try:
+            # proxies = get_proxies()
+            headers = dict()
+            headers['User-Agent'] = get_user_agent()
+            res = requests.get(url, headers=headers, timeout=60)
+            res.encoding = "utf-8"
+            if res.status_code == 200:
+                return res.text
+        except BaseException as e:
+            print(e)
 
 
 def parse_one_page(html):
@@ -43,6 +53,34 @@ def parse_one_page(html):
                 'score': eval(item[5].strip() + item[6].strip())
             }
     # print(items)
+
+
+def parse_one_page2(text):
+    parser = etree.HTMLParser(encoding="utf-8")
+    html = etree.HTML(text, parser=parser)
+    contents = html.xpath('//dd')
+    index, image_url, name, star, release_time, integer, fraction = [], [], [], [], [], [], []
+
+    for content in contents:
+        # print(etree.tostring(content, encoding='utf-8').decode('utf-8'))
+        # index, image_url, name, star, release_time, score是列表， 数据会一行行加进去
+        index = content.xpath('//dd/i[contains(@class, "board-index")]/text()')
+        image_url = content.xpath('//dd/a/img[@class="board-img"]/@data-src')
+        name = content.xpath('//dd/div//p[@class="name"]/a/text()')
+        star = content.xpath('//dd/div//p[@class="star"]/text()')
+        release_time = content.xpath('//dd/div//p[@class="releasetime"]/text()')
+        integer = content.xpath('//dd//div[contains(@class, "score-num")]//i[@class="integer"]/text()')
+        fraction = content.xpath('//dd//div[contains(@class, "score-num")]//i[@class="fraction"]/text()')
+
+    for item in range(len(index)):
+        yield {
+                "index": eval(str(index[item])),
+                "image_url": str(image_url[item]),
+                "name": str(name[item]),
+                "star": str(star[item]).strip().strip("主演："),
+                "release_time": str(release_time[item]).strip("上映时间："),
+                "score": float(str(integer[item]) + str(fraction[item]))
+        }
 
 
 def write_to_file(content):
@@ -101,15 +139,15 @@ def to_list(content):
 def main(offset=0):
     url = "http://maoyan.com/board/4?offset=" + str(offset)
     html = get_one_page(url)
-    dict_iter = parse_one_page(html)
-    # for item in dict_iter:
-    #     print(item)
-    #     write_to_file(item)
-    write_to_excel(to_list(dict_iter))
-    # print(html)
+    text = parse_one_page2(html)
+    for item in text:
+        write_to_file(item)
 
 
 if __name__ == "__main__":
     for i in range(10):
-        main(10 * i)
-        time.sleep(random.randint(1, 3))
+        main(i * 10)
+        print("已完成：" + str((i + 1) / 10 * 100) + "%")
+        if i >= 9:
+            break
+        time.sleep(random.randint(5, 10))
