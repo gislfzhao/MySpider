@@ -138,6 +138,8 @@ print(result)
 del html, result
 html = etree.parse('test2.html', etree.HTMLParser(encoding='utf-8'))
 # etree.tostring(html, encoding='utf-8').decode('utf-8')
+print("nihao")
+print(html.xpath('/*/*/*/*'))
 content = html.xpath('//dd')
 print(content[0])
 # index = content[0].xpath('/*')
