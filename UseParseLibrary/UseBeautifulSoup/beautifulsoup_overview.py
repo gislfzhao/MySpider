@@ -175,11 +175,12 @@ html = '''
     </div>
 '''
 soup = BeautifulSoup(html, "lxml")
-print(soup.select('.panel .panel-heading')[0].attrs['class'])
-print(type(soup.select('.panel .panel-heading')))
-print(soup.select('ul li'))
-print(soup.select("#list-2 .Element"))
-for ul in soup.select('ul'):
-    for li in ul.select('li'):
-        print(li.get_text())
-        print(li.string)
+print(soup.li)
+# print(soup.select('.panel .panel-heading')[0].attrs['class'])
+# print(type(soup.select('.panel .panel-heading')))
+# print(soup.select('ul li'))
+# print(soup.select("#list-2 .Element"))
+# for ul in soup.select('ul'):
+#     for li in ul.select('li'):
+#         print(li.get_text())
+#         print(li.string)
