@@ -75,3 +75,9 @@ print(li)
 del li
 li = doc('li:contains(second)')
 print(li)
+del li
+li = doc('.item-0').items()
+print(type(li))
+del li
+li = doc.find('li').items()
+print(li)
