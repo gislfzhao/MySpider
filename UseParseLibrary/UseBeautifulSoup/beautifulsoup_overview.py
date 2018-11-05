@@ -162,7 +162,7 @@ html = '''
         <h4>Hello</h4>
     </div>
 <div class="panel-body">
-    <ul class="list" id="list-1">
+    <ul class="list" id="list-1">nihao
         <li class="Element">Foo</li>
         <li class="Element">Bar</li>
         <li class="Element">Jay</li>
@@ -176,6 +176,7 @@ html = '''
 '''
 soup = BeautifulSoup(html, "lxml")
 print(soup.li)
+print(soup.find(name='ul').string)
 # print(soup.select('.panel .panel-heading')[0].attrs['class'])
 # print(type(soup.select('.panel .panel-heading')))
 # print(soup.select('ul li'))

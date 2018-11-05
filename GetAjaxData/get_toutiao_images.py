@@ -84,7 +84,7 @@ def main(offset):
 
 if __name__ == '__main__':
     pool = Pool()
-    groups = ([x * 20 for x in range(1, 10)])
+    groups = ([x * 20 for x in range(0, 9)])
     pool.map(main, groups)
     pool.close()
     pool.join()

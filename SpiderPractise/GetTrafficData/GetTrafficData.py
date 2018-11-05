@@ -60,14 +60,14 @@ def parse_page(json):
 
 
 def write_to_txt(item_road, filename):
-    with open('result.txt', 'a', encoding="utf-8") as f:
+    with open(filename, 'a', encoding="utf-8") as f:
         f.writelines(json.dumps(item_road, ensure_ascii=False) + "\n")
 
 
 def main():
     json = get_page(1)
     items = parse_page(json)
-    filename = time.strftime("%Y%m%d%H%M", time.localtime()) + ".txt"
+    filename = time.strftime("%Y_%m_%d %H_%M", time.localtime()) + ".txt"
     for item in items:
         print(item)
         write_to_txt(item, filename)
