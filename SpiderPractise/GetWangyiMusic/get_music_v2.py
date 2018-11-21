@@ -129,18 +129,22 @@ def download_song(list_name, song_name, song_id):
     else:
         try:
             headers['Host'] = 'music.163.com'
+            # 首先关闭重定向，判断singer_url是否能重定向，重定向会影响headers中的Host
+            # 由于singer_url包含music.163.com域名，且初始的headers中的Host(请求资源的主机号)为music.163.com
+            # 两者保持一致性， 可以保证能被正确访问
             res = requests.get(singer_url, headers=headers, stream=True, allow_redirects=False)
             print(res.headers)
-            if res.headers.get('Location'):
+            print(res.status_code, res.is_redirect)
+            if res.headers.get('Location'):     # 如果headers中含有'Location', 则表明存在重定向, 即res.is_redirect=True
                 print(res.headers.get('Location'))
-                if '//music.163.com/404' in res.headers.get('Location'):
+                if '//music.163.com/404' in res.headers.get('Location'):    # 重定向资源不存在
                     print('歌曲{}的下载资源无效！'.format(song_name))
                 else:
                     headers['Host'] = 'm10.music.126.net'
                     headers['User-Agent'] = get_user_agent()
                     requests.urlretrieve(res.headers.get('Location'), file_path, headers=headers)
                     print('歌曲{}下载成功！'.format(song_name))
-            else:
+            else:   # 无重定向，即res.is_redirect=False
                 headers['Host'] = 'music.163.com'
                 headers['User-Agent'] = get_user_agent()
                 requests.urlretrieve(singer_url, file_path, headers=headers)
@@ -201,12 +205,25 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    # main()
     # get_song_lyric('1323302330')
     # download_song('kong', '1323303004')
-    # res = requests.get('http://music.163.com/song/media/outer/url?id=1327060656.mp3', headers=headers, stream=True,
-    #                    allow_redirects=False)
-    # print(res.headers)
+    browser.quit()
+    del headers['Host']
+    res = requests.get('http://music.163.com/song/media/outer/url?id=554191055.mp3', headers=headers, stream=True,
+                       allow_redirects=True)
+    print(res.url)
+    print(res.reason)
+    print(res.is_redirect)
+    print(res.status_code)
+    print(res.headers)
+    res = requests.get('http://m10.music.126.net/20181121205900/c3f4b93985aad91e28cc17486415c028/ymusic/66c8/0941/1349/c3a847fae64a90b36a8a8169a2dc2d5f.mp3',
+                       headers=headers, stream=True, allow_redirects=True)
+    print(res.url)
+    print(res.status_code)
+    print(res.is_redirect)
+    print(res.reason)
+    print(res.headers)
     # requests.urlretrieve('http://m10.music.126.net/20181121172426/9ff44e6a07409fd9dbd095fd91ee0a94/ymusic/66c8/0941/1349/c3a847fae64a90b36a8a8169a2dc2d5f.mp3',filename='test.mp3', headers=headers)
     # res = requests.get('http://music.163.com/song/media/outer/url?id=1323303004.mp3', headers=headers, stream=True, allow_redirects=False)
     # requests.urlretrieve('http://m10.music.126.net/20181121172747/999e8704204848cafc28340d3308e3a9/ymusic/4614/ef38/ccfb/26965dc060c6d3f9bc5c6bae01c70516.mp3', filename='test2.mp3', headers=headers)
@@ -216,4 +233,4 @@ if __name__ == '__main__':
     # headers['Host'] = 'm10.music.126.net'
     # requests.urlretrieve('https://m10.music.126.net/20181121185528/8df62abd3c6948488b01c56ed91446ea/ymusic/9a65/8802/9928/08ddf3d2f54a4686f22266dfa6cbde62.mp3', headers=headers, filename='test3.mp3')
 
-    browser.quit()
+
