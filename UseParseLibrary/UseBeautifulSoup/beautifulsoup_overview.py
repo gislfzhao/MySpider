@@ -177,6 +177,8 @@ html = '''
 soup = BeautifulSoup(html, "lxml")
 print(soup.li)
 print(soup.find(name='ul').string)
+print(type(soup.find(name='ul').get_text()), soup.find(name='ul').get_text().replace('\n', '').replace('\t', '').
+      replace(' ', ''))
 # print(soup.select('.panel .panel-heading')[0].attrs['class'])
 # print(type(soup.select('.panel .panel-heading')))
 # print(soup.select('ul li'))

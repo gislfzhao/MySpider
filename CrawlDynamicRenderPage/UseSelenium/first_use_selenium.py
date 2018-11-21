@@ -176,7 +176,9 @@ def tabs_management():
 
 
 def get_traffic_data():
-    browser = webdriver.Chrome()
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument('--headless')
+    browser = webdriver.Chrome(chrome_options=chrome_options)
     browser.get('http://www.nitrafficindex.com/')
     browser.switch_to.frame('mainIframe')
     time.sleep(3)

@@ -2,6 +2,8 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/CrackImageCode" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../PythonDataStructure" vcs="Git" />
+    <mapping directory="C:\Users\GISzhao\Desktop\MySpider\CrackImageCode" vcs="Git" />
   </component>
 </project>

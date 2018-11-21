@@ -105,7 +105,7 @@ def main(offset=0):
     # for item in dict_iter:
     #     print(item)
     #     write_to_file(item)
-    write_to_excel(to_list(dict_iter))
+    # write_to_excel(to_list(dict_iter))
     # print(html)
 
 

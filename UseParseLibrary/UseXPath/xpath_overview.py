@@ -18,7 +18,7 @@ text = '''
 # print(type(result), result)
 # print(type(result), result.decode("utf-8"))
 
-html = etree.parse('test.html', etree.HTMLParser())
+html = etree.parse('test1.html', etree.HTMLParser())
 # result = etree.tostring(html)
 result = html.xpath("//*")
 print(result)
@@ -71,7 +71,7 @@ result = html.xpath('//li[contains(@class, "li") and @name="item"]/a/text()')
 print(result)
 
 del html, result, text
-html = etree.parse('test.html', etree.HTMLParser())
+html = etree.parse('test1.html', etree.HTMLParser())
 result = html.xpath('//li|//a')
 print(result)
 

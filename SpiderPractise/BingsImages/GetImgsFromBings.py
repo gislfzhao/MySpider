@@ -105,7 +105,7 @@ def main(num):
 
 if __name__ == '__main__':
     pool = Pool()
-    groups = ([x for x in range(1, 83)])
+    groups = ([x for x in range(1, 3)])
     pool.map(main, groups)
     pool.close()
     pool.join()

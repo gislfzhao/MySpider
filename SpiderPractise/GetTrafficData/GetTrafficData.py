@@ -13,8 +13,11 @@ def get_user_agent():
     return random.choice(USER_AGENTS)
 
 
-def get_page(page):
+def get_page_verify(page):
     headers = {
+        'Accept': 'application/json, text/javascript, */*',
+        'Accept-Encoding': 'gzip, deflate',
+        'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
         'Origin': 'http: // www.nitrafficindex.com',
         'Referer': 'http://www.nitrafficindex.com/trafficIndexAnalysis.html',
         'User-Agent': get_user_agent(),
@@ -24,8 +27,39 @@ def get_page(page):
     data = {
         'areaCode': '110000',
         'roadLevel': '1, 2, 3, 4',
+        # 'page': page,
+        # # 'rows': '1000',
+        # 'roadId': '1100001yong1he2gong1da4jie1',
+        # 'startDate': -1,
+        # 'timeSize': 5
+    }
+    url = 'http://www.nitrafficindex.com/traffic/getRoadIndex.do'
+    try:
+        response = requests.post(url, headers=headers, data=data)  # PSOT方法，表单数据进行爬取
+        if response.status_code == 200:
+            print(response.json())
+            # rows = response.json().get('roads')
+            # print(len(rows))
+            # print(response.json().get('date'))
+            return response.json()
+    except requests.ConnectionError as e:
+        print("ERROR:", e.args)
+        return None
+
+
+def get_page(page):
+    headers = {
+        'Origin': 'http: // www.nitrafficindex.com',
+        'Referer': 'http://www.nitrafficindex.com/trafficIndexAnalysis.html',
+        'User-Agent': get_user_agent(),
+        'Host': 'www.nitrafficindex.com',
+        'X-Requested-With': 'XMLHttpRequest',
+    }
+    data = {
+        'areaCode': '120000',
+        'roadLevel': '1, 2, 3, 4',
         'page': page,
-        'rows': '1245',
+        'rows': '1000',
     }
     url = 'http://www.nitrafficindex.com/traffic/getRoadIndex.do'
     try:
@@ -74,4 +108,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    # main()
+    get_page_verify(1)

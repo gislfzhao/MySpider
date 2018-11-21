@@ -31,7 +31,7 @@ def index_page(page):
                 By.CSS_SELECTOR, '#mainsrp-pager div.form > input')))
             submit = wait.until(EC.element_to_be_clickable((
                 By.CSS_SELECTOR, '#mainsrp-pager div.form > span.btn.J_Submit')))
-            input_page.clear()
+            input_page.clear()  # 清除文本,方便之后输入
             input_page.send_keys(page)
             submit.click()
             sleep(2)
@@ -73,7 +73,7 @@ def get_products():
 
 
 def write_to_file(product):
-    with open(KEYWORD + '_goods_result.txt', 'a', encoding='utf-8') as f:
+    with open(KEYWORD + '2_goods_result.txt', 'a', encoding='utf-8') as f:
         f.write(json.dumps(product, ensure_ascii=False) + "\n")
 
 
