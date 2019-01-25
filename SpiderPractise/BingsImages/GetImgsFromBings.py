@@ -71,7 +71,7 @@ def save_image(image_json):
                 'User-Agent': get_user_agent()
             }
             proxies = get_user_proxy()
-            response = requests.get(image_json.get('image_url'), headers=headers)
+            response = requests.get(image_json.get('image_url'), headers=headers, verify=False)
             if response.status_code == 200:
                 file_path = '{0}/{1}.{2}'.format('bings_pictures', image_json.get('title'), 'jpg')
                 if not os.path.exists(file_path):

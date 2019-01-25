@@ -2,6 +2,7 @@
 import json
 import os
 import requests
+from multiprocessing import Pool
 from time import sleep
 from pyquery import PyQuery as pq
 from selenium import webdriver
@@ -153,19 +154,25 @@ def download_song(list_name, song_name, song_id):
             print('歌曲{}下载过程中出错'.format(song_name), e.args)
 
 
+def save_song(song):
+    list_name = song.get('toplist', '音乐榜')
+    # 判断存储榜单文件夹是否存在
+    if not os.path.exists(list_name):
+        os.mkdir(list_name)
+    song_id = song.get('song_link').replace('/song?id=', '')
+    song_name = song.get('songname')
+    download_song(list_name, song_name, song_id)
+    song_lyric = get_song_lyric(song_id)
+    write_lyric(list_name, song_name, song_lyric)
+    sleep(1)
+
+
 def save_songs_from_lists(list_songs):
-    # print(len(list(list_songs)))
-    for song in list_songs:
-        list_name = song.get('toplist', '音乐榜')
-        # 判断存储榜单文件夹是否存在
-        if not os.path.exists(list_name):
-            os.mkdir(list_name)
-        song_id = song.get('song_link').replace('/song?id=', '')
-        song_name = song.get('songname')
-        download_song(list_name, song_name, song_id)
-        song_lyric = get_song_lyric(song_id)
-        write_lyric(list_name, song_name, song_lyric)
-        sleep(1)
+    pool = Pool()
+    pool.map(save_song, list_songs)
+    pool.close()
+    pool.join()
+    browser.quit()
 
 
 def music_index_page():
@@ -192,12 +199,16 @@ def music_index_page():
 
 def main():
     # music_index_page()
-    browser.get('https://music.163.com/#/discover/toplist?id=2250011882')
+    browser.get('https://music.163.com/#/discover/toplist?id=2884035')
     sleep(2)
     wait.until(EC.presence_of_element_located((By.ID, 'g_iframe')))
     browser.switch_to.frame('g_iframe')
     sleep(2)
     list_songs1 = get_musics()
+
+    for cookie in browser.get_cookies():
+        print(cookie)
+
     # for song in list_songs1:
     #     print(song)
     # save_songs_from_lists(list_songs1)
@@ -206,34 +217,5 @@ def main():
 
 if __name__ == '__main__':
     main()
-    # # get_song_lyric('1323302330')
-    # # download_song('kong', '1323303004')
-    #
-    # # del headers['Host']
-    # # res = requests.get('http://music.163.com3/song/media/outer/url?id=554191055.mp', headers=headers, stream=True,
-    # #                    allow_redirects=True)
-    # # print(res.url)
-    # # print(res.reason)
-    # # print(res.is_redirect)
-    # # print(res.status_code)
-    # # print(res.headers)
-    # # res = requests.get('http://m10.music.126.net/20181121205900/c3f4b93985aad91e28cc17486415c028/ymusic/66c8/0941/1349/c3a847fae64a90b36a8a8169a2dc2d5f.mp3',
-    # #                    headers=headers, stream=True, allow_redirects=True)
-    # # print(res.url)
-    # # print(res.status_code)
-    # # print(res.is_redirect)
-    # # print(res.reason)
-    # # print(res.headers)
-    # # requests.urlretrieve('http://m10.music.126.net/20181121172426/9ff44e6a07409fd9dbd095fd91ee0a94/ymusic/66c8/0941/1349/c3a847fae64a90b36a8a8169a2dc2d5f.mp3',filename='test.mp3', headers=headers)
-    # # res = requests.get('http://music.163.com/song/media/outer/url?id=1323303004.mp3', headers=headers, stream=True, allow_redirects=False)
-    # # requests.urlretrieve('http://m10.music.126.net/20181121172747/999e8704204848cafc28340d3308e3a9/ymusic/4614/ef38/ccfb/26965dc060c6d3f9bc5c6bae01c70516.mp3', filename='test2.mp3', headers=headers)
-    # # print(res.headers)
-    # # res = requests.get('http://music.163.com/song/media/outer/url?id=1323302330.mp3', headers=headers, stream=True, allow_redirects=False)
-    # # print(res.headers)
-    # # headers['Host'] = 'm10.music.126.net'
-    # # requests.urlretrieve('https://m10.music.126.net/20181121185528/8df62abd3c6948488b01c56ed91446ea/ymusic/9a65/8802/9928/08ddf3d2f54a4686f22266dfa6cbde62.mp3', headers=headers, filename='test3.mp3')
-    # browser.get('https://music.163.com/#/discover/toplist?id=2250011882')
-    # sleep(3)
-    # print(browser.get_cookies())
     browser.quit()
 

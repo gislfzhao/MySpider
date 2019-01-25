@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 import json
 import random
 import time
@@ -89,7 +90,7 @@ def get_tencent_roll_news():
     url = "http://roll.news.qq.com/interface/cpcroll.php?"
     params = {
         'callback': 'rollback',
-        'site': 'sports',
+        'site': 'news',
         'mode': 1,
         'cata': '',
         'date': '2018-11-23',
@@ -102,7 +103,7 @@ def get_tencent_roll_news():
         'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
         'Connection': 'keep-alive',
         'User-Agent': get_user_agent(),
-        'Referer': 'http://sports.qq.com/articleList/rolls/',
+        'Referer': 'http://news.qq.com/articleList/rolls/',
         'Host': 'roll.news.qq.com'
     }
     try:
@@ -150,7 +151,7 @@ def get_article_info(articles):
         'Accept-Encoding': 'gzip, deflate',
         'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
         'User-Agent': get_user_agent(),
-        'Referer': 'http://sports.qq.com/articleList/rolls/',
+        'Referer': 'http://news.qq.com/articleList/rolls/',
         'upgrade-insecure-requests': '1'
     }
     for article in articles:
@@ -184,9 +185,9 @@ def get_article_info(articles):
 
 
 def save_images(article):
-    if not os.path.exists('sports1123/' + article.get('store_path')):
+    if not os.path.exists('news1123/' + article.get('store_path')):
         if article.get('store_path'):
-            os.mkdir('sports1123/' + article.get('store_path'))
+            os.mkdir('news1123/' + article.get('store_path'))
     try:
         headers = {
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
@@ -197,17 +198,18 @@ def save_images(article):
         }
         if article.get('img_urls'):
             print(article.get('img_urls'))
-            # count = 0
-            url = article.get('img_urls')[0]
-            response = requests.get(url, headers=headers)
-            print(response.status_code)
-            if response.status_code == 200:
-                file_path = 'sports1123/{0}/{1}.{2}'.format(article.get('store_path'), 0, 'jpg')
-                if not os.path.exists(file_path):
-                    with open(file_path, 'wb') as f:
-                        f.write(response.content)
-                else:
-                    print('Already Downloaded', file_path)
+            count = 0
+            for url in article.get('img_urls'):
+                response = requests.get(url, headers=headers)
+                if response.status_code == 200:
+                    file_path = 'news1123/{0}/{1}.{2}'.format(article.get('store_path'), count, '.jpg')
+                    if not os.path.exists(file_path):
+                        with open(file_path, 'wb') as f:
+                            f.write(response.content)
+                    else:
+                        print('Already Downloaded', file_path)
+                count += 1
+                break
     except requests.ConnectionError:
         print('Failed to Save Image')
 
@@ -217,13 +219,14 @@ if __name__ == '__main__':
     news_jsons = get_tencent_roll_news()
     articles = parse_tencent_roll_news(news_jsons)
     articles2 = list(get_article_info(articles))
-    if not os.path.exists('sports1123'):
-        os.mkdir('sports1123')
+    if not os.path.exists('news1123'):
+        os.mkdir('news1123')
     for article in articles2:
-        write_to_txt(article, 'sports1123/tencent_sports')
+        write_to_txt(article, 'news1123/tencent_news')
     print(list(articles2))
     print(articles2)
     pool = Pool()
     pool.map(save_images, articles2)
     pool.close()
     pool.join()
+

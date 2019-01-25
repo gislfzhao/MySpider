@@ -149,6 +149,7 @@ class WeixinSpider:
             print('Schedule', weixin_res.url)
             response = self.start_request(weixin_res)
             if response and response.status_code == 200:
+                # 回调函数进行执行
                 results = callback(response)
                 if results:
                     for result in results:
